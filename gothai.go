@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-  http.HandleFunc("/", handler)
+  http.HandleFunc("/submitWord", handler)
   fmt.Println("Listening...")
   err := http.ListenAndServe(GetPort(),nil)
   if err != nil {
@@ -18,6 +18,11 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+  w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token")
+  w.Header().Set("Access-Control-Allow-Credentials", "true")
+  fmt.Println(r)
   fmt.Fprintf(w, "Hello this is our first Go web program!")
 }
 
