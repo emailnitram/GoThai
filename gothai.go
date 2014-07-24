@@ -15,6 +15,17 @@ type Message struct {
 type Question struct {
   Number int `json:"questionNumber"`
 }
+type Response map[string]interface{}
+
+func (r Response) String() (s string) {
+  b, err := json.Marshal(r)
+  if err != nil {
+    s = ""
+    return
+  }
+  s = string(b)
+  return
+}
 
 func main() {
   http.HandleFunc("/submitWord", handler)
@@ -39,7 +50,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
   _ = err
   fmt.Println(msg)
-  fmt.Fprintf(w, "Hello this is our first Go web program!")
+
+  if msg.Word == "Martin" {
+    fmt.Fprint(w, Response{"success":true})
+  } else {
+    fmt.Fprint(w, Response{"success":false})
+  }
+
 }
 
 func GetPort() string {
