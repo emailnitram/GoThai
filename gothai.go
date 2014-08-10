@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"time"
-	// "io/ioutil"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 	// "os"
 )
 
@@ -17,6 +17,11 @@ type Question struct {
 	Name          string
 	Answers       []string
 	correctAnswer int
+}
+
+type AnswerAttempt struct {
+	QuestionId string `json:"QuestionId"`
+	AnswerId   string `json:"AnswerId"`
 }
 
 var currentQuestionNum int = 0
@@ -34,6 +39,14 @@ func main() {
 }
 
 func getQuestion(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8000")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	// fmt.Println("method", r.Method)
+	// if r.Method == "OPTIONS" {
+	// 	w.Write("200 OK")
+	// }
 	maxWait := time.Duration(5 * time.Second)
 	session, err := mgo.DialWithTimeout("localhost:27017", maxWait)
 	if err != nil {
@@ -50,10 +63,33 @@ func getQuestion(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	fmt.Println(result)
+	fmt.Println(r)
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal("ReadAll: ", err)
+		return
+	}
+	defer r.Body.Close()
+	fmt.Println("BODY", string(body))
+	var answer AnswerAttempt
+	if body == nil {
+		fmt.Println("BODY is nil")
+		return
+	}
+	err = json.Unmarshal(body, &answer)
+	_ = err
+	// if err != nil {
+	// 	panic(err)
+	// }
+	fmt.Printf("%s", answer)
+
+	// respond with next question
 	b, err := json.Marshal(result)
 	if err != nil {
 		panic(err)
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(b)
 	// currentQuestionNum++
 }
