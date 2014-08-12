@@ -20,8 +20,8 @@ type Question struct {
 }
 
 type AnswerAttempt struct {
-	QuestionId string `json:"QuestionId"`
-	AnswerId   string `json:"AnswerId"`
+	QuestionId int `json:"QuestionId"`
+	AnswerId   int `json:"AnswerId"`
 }
 
 var currentQuestionNum int = 0
@@ -71,18 +71,15 @@ func getQuestion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	fmt.Println("BODY", string(body))
 	var answer AnswerAttempt
-	if body == nil {
-		fmt.Println("BODY is nil")
-		return
-	}
+
+	fmt.Println("Body", string(body))
 	err = json.Unmarshal(body, &answer)
 	_ = err
 	// if err != nil {
 	// 	panic(err)
 	// }
-	fmt.Printf("%s", answer)
+	fmt.Println("Answer", answer)
 
 	// respond with next question
 	b, err := json.Marshal(result)

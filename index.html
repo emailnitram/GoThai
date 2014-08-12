@@ -5,34 +5,34 @@
   <script>
     angular.module('thaiQuizApp', [])
     .controller('MainController', ['$scope', '$http', function($scope, $http) {
+      $scope.selectedAnswer = null;
       function getQuestion() {
         $http.get('http://localhost:4747/question').success(function(data){
-          console.log(data)
+          console.log('getQuestion data: ', data)
           $scope.question = data;
         })
       }
-      function postAnswer() {
-        $http.post('http://localhost:4747/question',{QuestionId:0,AnswerId:1}).success(function(data){
-          console.log(data)
-          $scope.inbound = {
-            stop: data.StopName,
-            direction: data.Direction,
-            departureTimes: data.DepartureTimes
-          }
+      function postAnswer(params) {
+        $http.post('http://localhost:4747/question', params).success(function(data){
+          console.log('postAnswer data:', data)
         })
       }
-      postAnswer()
-      // getQuestion()
+      $scope.submitAnswer = function() {
+        var params = { QuestionId: $scope.question.Id, AnswerId: $scope.selectedAnswer }
+        postAnswer(params)
+      };
+      // on initial load get 1st question
+      getQuestion();
     }]);
   </script>
 </head>
-<body>
+<body ng-controller="MainController">
   <h2>Thai Quiz</h2>
-  <div ng-controller="MainController">
-    <form ng-submit="addTodo()">
-      <span>{{questions.Name}}</span>
+  <div>
+    <form ng-submit="submitAnswer()">
+      <span>{{question.Name}}</span><br />
       <label ng-repeat="answer in question.Answers">
-        <input type="radio" name="answer" ng-model="answer" ng-value="$index" />{{answer}}
+        <input type="radio" name="answer" ng-model="$parent.selectedAnswer" ng-value="$index" />{{answer}}<br />
       </label>
         <input class="btn-primary" type="submit" value="Submit">
     </form>
