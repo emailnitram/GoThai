@@ -1,0 +1,42 @@
+<!doctype html>
+<html ng-app="thaiQuizApp">
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular.min.js"></script>
+  <script src="/js/bundle.js"></script>
+  <script>
+    angular.module('thaiQuizApp', [])
+    .controller('MainController', ['$scope', '$http', function($scope, $http) {
+      $scope.selectedAnswer = null;
+      function getQuestion() {
+        $http.get('http://localhost:4747/question').success(function(data){
+          console.log('getQuestion data: ', data)
+          $scope.question = data;
+        })
+      }
+      function postAnswer(params) {
+        $http.post('http://localhost:4747/question', params).success(function(data){
+          console.log('postAnswer data:', data)
+        })
+      }
+      $scope.submitAnswer = function() {
+        var params = { QuestionId: $scope.question.Id, AnswerId: $scope.selectedAnswer }
+        postAnswer(params)
+      };
+      // on initial load get 1st question
+      getQuestion();
+    }]);
+  </script>
+</head>
+<body ng-controller="MainController">
+  <h2>Thai Quiz</h2>
+  <div>
+    <form ng-submit="submitAnswer()">
+      <span>{{question.Name}}</span><br />
+      <label ng-repeat="answer in question.Answers">
+        <input type="radio" name="answer" ng-model="$parent.selectedAnswer" ng-value="$index" />{{answer}}<br />
+      </label>
+        <input class="btn-primary" type="submit" value="Submit">
+    </form>
+  </div>
+</body>
+</html>
