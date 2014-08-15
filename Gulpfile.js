@@ -28,7 +28,7 @@ gulp.task('browserify', function() {
 
 gulp.task('watch', ['lint'], function() {
   // Watch our scripts
-  gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js], [
+  gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js'], [
     'lint',
     'broswerify'
     ]);
