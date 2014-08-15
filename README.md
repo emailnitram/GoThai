@@ -1,3 +1,3 @@
 #GoThai
 
-Machine learning Thai educator
+Quiz to learn about Thailand
