@@ -34,3 +34,14 @@ gulp.task('watch', ['lint'], function() {
     ]);
 });
 
+gulp.task('views', function() {
+  gulp.src('app/index.html')
+  .pipe(gulp.dest('dist/'));
+
+  gulp.src('./app/views/**/*')
+  .pipe(gulp.dest('dist/views/'));
+});
+
+gulp.watch(['app/index.html', 'app/views/**/*.html'], [
+  'views'
+]);
