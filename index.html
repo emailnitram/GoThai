@@ -9,16 +9,30 @@
       function getQuestion() {
         $http.get('http://localhost:4747/question').success(function(data){
           console.log('getQuestion data: ', data)
+          if(data.success === false) {
+            $scope.score = data.score;
+          }
           $scope.question = data;
-        })
+        });
       }
       function postAnswer(params) {
         $http.post('http://localhost:4747/question', params).success(function(data){
           console.log('postAnswer data:', data)
-        })
+          if(data.success === true) {
+            getQuestion();
+          }
+        });
       }
       $scope.submitAnswer = function() {
+        if ($scope.selectedAnswer === null) {
+          $scope.error = true;
+          return;
+        } else {
+          $scope.error = false;
+        }
+
         var params = { QuestionId: $scope.question.Id, AnswerId: $scope.selectedAnswer }
+        $scope.selectedAnswer = null;
         postAnswer(params)
       };
       // on initial load get 1st question
@@ -29,11 +43,13 @@
 <body ng-controller="MainController">
   <h2>Thai Quiz</h2>
   <div>
-    <form ng-submit="submitAnswer()">
+    <h1>Score: {{score}}!</h1>
+    <form ng-submit="submitAnswer()" ng-hide="score !== undefined">
       <span>{{question.Name}}</span><br />
       <label ng-repeat="answer in question.Answers">
         <input type="radio" name="answer" ng-model="$parent.selectedAnswer" ng-value="$index" />{{answer}}<br />
       </label>
+        <span ng-show="error">Please select an answer</span><br>
         <input class="btn-primary" type="submit" value="Submit">
     </form>
   </div>
