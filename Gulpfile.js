@@ -17,7 +17,7 @@ var embedlr = require('gulp-embedlr'),
 gulp.task('lint', function() {
   gulp.src('./app/scripts/*.js')
   .pipe(jshint())
-  .pipe(jshint.reporter('default'));
+  // .pipe(jshint.reporter('default'));
 });
 
 // Browserify task
@@ -31,14 +31,15 @@ gulp.task('browserify', function() {
   // Bundle to a single file
   .pipe(concat('bundle.js'))
   // Output it to our dist folder
-  .pipe(gulp.dest('dist/js'));
+  .pipe(gulp.dest('dist/js'))
+  .pipe(refresh(lrserver));
 });
 
 gulp.task('watch', ['lint'], function() {
   // Watch our scripts
   gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js'], [
     'lint',
-    'broswerify'
+    'browserify'
     ]);
 });
 
@@ -47,7 +48,8 @@ gulp.task('views', function() {
   .pipe(gulp.dest('dist/'));
 
   gulp.src('./app/views/**/*')
-  .pipe(gulp.dest('dist/views/'));
+  .pipe(gulp.dest('dist/views/'))
+  .pipe(refresh(lrserver));
 });
 
 gulp.watch(['app/index.html', 'app/views/**/*.html'], [
@@ -58,7 +60,7 @@ var server = express();
 server.use(livereload({port: livereloadport}));
 server.use(express.static('./dist'));
 server.all('/*', function(req, res) {
-  res.sendfile('index.html', { root: 'dist' });
+  res.sendFile('index.html', { root: 'dist' });
 });
 
 gulp.task('dev', function() {
